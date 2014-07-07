@@ -43,6 +43,7 @@ import eu.stratosphere.streaming.api.invokable.UserTaskInvokable;
 import eu.stratosphere.streaming.api.streamcomponent.StreamSink;
 import eu.stratosphere.streaming.api.streamcomponent.StreamSource;
 import eu.stratosphere.streaming.api.streamcomponent.StreamTask;
+import eu.stratosphere.streaming.api.streamrecord.OutStreamRecord;
 import eu.stratosphere.streaming.api.streamrecord.StreamRecord;
 import eu.stratosphere.streaming.faulttolerance.FaultToleranceType;
 import eu.stratosphere.streaming.partitioner.BroadcastPartitioner;
@@ -60,7 +61,7 @@ public class JobGraphBuilder {
 	protected Map<String, AbstractJobVertex> components;
 	protected Map<String, Integer> numberOfInstances;
 	protected Map<String, List<String>> edgeList;
-	protected Map<String, List<Class<? extends ChannelSelector<StreamRecord>>>> connectionTypes;
+	protected Map<String, List<Class<? extends ChannelSelector<OutStreamRecord>>>> connectionTypes;
 	protected String maxParallelismVertexName;
 	protected int maxParallelism;
 	protected FaultToleranceType faultToleranceType;
@@ -80,7 +81,7 @@ public class JobGraphBuilder {
 		components = new HashMap<String, AbstractJobVertex>();
 		numberOfInstances = new HashMap<String, Integer>();
 		edgeList = new HashMap<String, List<String>>();
-		connectionTypes = new HashMap<String, List<Class<? extends ChannelSelector<StreamRecord>>>>();
+		connectionTypes = new HashMap<String, List<Class<? extends ChannelSelector<OutStreamRecord>>>>();
 		maxParallelismVertexName = "";
 		maxParallelism = 0;
 		if (log.isDebugEnabled()) {
@@ -360,7 +361,7 @@ public class JobGraphBuilder {
 			edgeList.get(upStreamComponentName).add(downStreamComponentName);
 		} else {
 			connectionTypes.put(upStreamComponentName,
-					new ArrayList<Class<? extends ChannelSelector<StreamRecord>>>());
+					new ArrayList<Class<? extends ChannelSelector<OutStreamRecord>>>());
 			connectionTypes.get(upStreamComponentName).add(FieldsPartitioner.class);
 
 			edgeList.put(upStreamComponentName, new ArrayList<String>());
@@ -413,7 +414,7 @@ public class JobGraphBuilder {
 	 *            Class of the partitioner
 	 */
 	private void connect(String upStreamComponentName, String downStreamComponentName,
-			Class<? extends ChannelSelector<StreamRecord>> PartitionerClass) {
+			Class<? extends ChannelSelector<OutStreamRecord>> PartitionerClass) {
 
 		AbstractJobVertex upStreamComponent = components.get(upStreamComponentName);
 		AbstractJobVertex downStreamComponent = components.get(downStreamComponentName);

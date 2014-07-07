@@ -45,6 +45,7 @@ import eu.stratosphere.streaming.api.invokable.StreamComponentInvokable;
 import eu.stratosphere.streaming.api.invokable.StreamRecordInvokable;
 import eu.stratosphere.streaming.api.invokable.UserSourceInvokable;
 import eu.stratosphere.streaming.api.streamrecord.ArrayStreamRecord;
+import eu.stratosphere.streaming.api.streamrecord.OutStreamRecord;
 import eu.stratosphere.streaming.api.streamrecord.StreamCollectorManager;
 import eu.stratosphere.streaming.api.streamrecord.StreamRecord;
 import eu.stratosphere.streaming.partitioner.DefaultPartitioner;
@@ -67,8 +68,8 @@ public abstract class AbstractStreamComponent extends AbstractInvokable {
 	private List<Integer> numOfOutputsPartitioned = new ArrayList<Integer>();
 	private int keyPosition = 0;
 
-	private List<RecordWriter<StreamRecord>> outputsNotPartitioned = new ArrayList<RecordWriter<StreamRecord>>();
-	private List<RecordWriter<StreamRecord>> outputsPartitioned = new ArrayList<RecordWriter<StreamRecord>>();
+	private List<RecordWriter<OutStreamRecord>> outputsNotPartitioned = new ArrayList<RecordWriter<OutStreamRecord>>();
+	private List<RecordWriter<OutStreamRecord>> outputsPartitioned = new ArrayList<RecordWriter<OutStreamRecord>>();
 
 	protected Configuration configuration;
 	protected Collector<Tuple> collector;
@@ -86,10 +87,10 @@ public abstract class AbstractStreamComponent extends AbstractInvokable {
 		name = configuration.getString("componentName", "MISSING_COMPONENT_NAME");
 	}
 	
-	protected Collector<Tuple> setCollector(List<RecordWriter<StreamRecord>> outputs) {
+	protected Collector<Tuple> setCollector(List<RecordWriter<OutStreamRecord>> outputs) {
 		long batchTimeout = configuration.getLong("batchTimeout", 1000);
 
-		collector = new StreamCollectorManager<Tuple>(batchSizesNotPartitioned,
+		collector = new StreamCollectorManager(batchSizesNotPartitioned,
 				batchSizesPartitioned, numOfOutputsPartitioned, keyPosition, batchTimeout,
 				instanceID, outSerializationDelegate, outputsPartitioned, outputsNotPartitioned);
 		return collector;
@@ -186,16 +187,16 @@ public abstract class AbstractStreamComponent extends AbstractInvokable {
 		}
 	}
 
-	protected void setConfigOutputs(List<RecordWriter<StreamRecord>> outputs,
-			List<ChannelSelector<StreamRecord>> partitioners) throws StreamComponentException {
+	protected void setConfigOutputs(List<RecordWriter<OutStreamRecord>> outputs,
+			List<ChannelSelector<OutStreamRecord>> partitioners) throws StreamComponentException {
 
 		int numberOfOutputs = configuration.getInteger("numberOfOutputs", 0);
 
 		for (int i = 0; i < numberOfOutputs; i++) {
 			setPartitioner(i, partitioners);
-			ChannelSelector<StreamRecord> outputPartitioner = partitioners.get(i);
+			ChannelSelector<OutStreamRecord> outputPartitioner = partitioners.get(i);
 
-			outputs.add(new RecordWriter<StreamRecord>(this, outputPartitioner));
+			outputs.add(new RecordWriter<OutStreamRecord>(this, outputPartitioner));
 
 			if (outputsPartitioned.size() < batchSizesPartitioned.size()) {
 				outputsPartitioned.add(outputs.get(i));
@@ -206,9 +207,9 @@ public abstract class AbstractStreamComponent extends AbstractInvokable {
 	}
 
 	private void setPartitioner(int numberOfOutputs,
-			List<ChannelSelector<StreamRecord>> partitioners) {
+			List<ChannelSelector<OutStreamRecord>> partitioners) {
 
-		Class<? extends ChannelSelector<StreamRecord>> partitioner = configuration.getClass(
+		Class<? extends ChannelSelector<OutStreamRecord>> partitioner = configuration.getClass(
 				"partitionerClass_" + numberOfOutputs, DefaultPartitioner.class,
 				ChannelSelector.class);
 

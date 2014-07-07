@@ -20,35 +20,29 @@ import eu.stratosphere.pact.runtime.plugable.SerializationDelegate;
 import eu.stratosphere.runtime.io.api.RecordWriter;
 import eu.stratosphere.util.Collector;
 
-public class StreamCollector<T extends Tuple> implements Collector<T> {
+public class StreamCollector implements Collector<byte[]> {
 
-	protected StreamRecord streamRecord;
+	protected OutStreamRecord streamRecord;
 	protected int batchSize;
 	protected long batchTimeout;
 	protected int counter = 0;
 	protected int channelID;
 	private long timeOfLastRecordEmitted = System.currentTimeMillis();;
-	private RecordWriter<StreamRecord> output;
+	private RecordWriter<OutStreamRecord> output;
 
-	public StreamCollector(int batchSize, long batchTimeout, int channelID,
-			SerializationDelegate<Tuple> serializationDelegate, RecordWriter<StreamRecord> output) {
+	public StreamCollector(int batchSize, long batchTimeout, int channelID,RecordWriter<OutStreamRecord> output) {
 		this.batchSize = batchSize;
 		this.batchTimeout = batchTimeout;
-		this.streamRecord = new ArrayStreamRecord(batchSize);
-		this.streamRecord.setSeralizationDelegate(serializationDelegate);
+		this.streamRecord = new OutStreamRecord(batchSize);
 		this.channelID = channelID;
 		this.output = output;
 	}
 
-	public StreamCollector(int batchSize, long batchTimeout, int channelID,
-			SerializationDelegate<Tuple> serializationDelegate) {
-		this(batchSize, batchTimeout, channelID, serializationDelegate, null);
-	}
 
 	// TODO reconsider emitting mechanism at timeout (find a place to timeout)
 	@Override
-	public void collect(T tuple) {
-		streamRecord.setTuple(counter, tuple);
+	public void collect(byte[] bytes) {
+		streamRecord.setBytes(counter, bytes);
 		counter++;
 
 		if (counter >= batchSize) {
@@ -61,13 +55,13 @@ public class StreamCollector<T extends Tuple> implements Collector<T> {
 
 	public void timeout() {
 		if (timeOfLastRecordEmitted + batchTimeout < System.currentTimeMillis()) {
-			StreamRecord truncatedRecord = new ArrayStreamRecord(streamRecord, counter);
+			OutStreamRecord truncatedRecord = new OutStreamRecord(streamRecord, counter);
 			emit(truncatedRecord);
 			timeOfLastRecordEmitted = System.currentTimeMillis();
 		}
 	}
 
-	private void emit(StreamRecord streamRecord) {
+	private void emit(OutStreamRecord streamRecord) {
 		counter = 0;
 		streamRecord.setId(channelID);
 

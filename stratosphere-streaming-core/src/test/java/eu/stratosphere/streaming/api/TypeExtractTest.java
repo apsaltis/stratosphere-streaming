@@ -23,10 +23,19 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.Arrays;
 
 import org.junit.Test;
 
+import eu.stratosphere.api.java.tuple.Tuple;
+import eu.stratosphere.api.java.tuple.Tuple1;
+import eu.stratosphere.api.java.typeutils.TupleTypeInfo;
 import eu.stratosphere.api.java.typeutils.TypeExtractor;
+import eu.stratosphere.api.java.typeutils.runtime.TupleSerializer;
+import eu.stratosphere.pact.runtime.plugable.DeserializationDelegate;
+import eu.stratosphere.pact.runtime.plugable.SerializationDelegate;
+import eu.stratosphere.streaming.api.streamrecord.ArrayStreamRecord;
+import eu.stratosphere.streaming.api.streamrecord.OutStreamRecord;
 import eu.stratosphere.types.TypeInformation;
 
 public class TypeExtractTest {
@@ -59,6 +68,55 @@ public class TypeExtractTest {
 		ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray()));
 
 		assertTrue(true);
+		
+		TupleTypeInfo<Tuple> tti = ((TupleTypeInfo) (TypeExtractor
+				.getForObject(new Tuple1<Integer>(2))));
+		
+		TupleSerializer<Tuple> tss = tti.createSerializer();
+
+		SerializationDelegate<Tuple> serializationDelegate = new SerializationDelegate<Tuple>(tss);
+		System.out.println(serializationDelegate);
+
+		ByteArrayOutputStream simpleOutputStream = new ByteArrayOutputStream();
+		ObjectOutputStream o;
+
+		
+		o = new ObjectOutputStream(simpleOutputStream);
+		Tuple1<Integer> tuple = new Tuple1<Integer>(1000000000);
+
+		serializationDelegate.setInstance(tuple);
+		serializationDelegate.write(o);
+		o.flush();
+
+		ByteArrayOutputStream b2 = new ByteArrayOutputStream();
+		ObjectOutputStream o2= new ObjectOutputStream(b2);
+		
+		
+		o2.write(Arrays.copyOfRange(simpleOutputStream.toByteArray(), 6, simpleOutputStream.toByteArray().length));
+		o2.flush();
+		System.out.println(Arrays.toString(b2.toByteArray()));
+		System.out.println(Arrays.toString(simpleOutputStream.toByteArray()));
+
+		System.out.println(tss);
+
+		ArrayStreamRecord as = new ArrayStreamRecord();
+		
+		DeserializationDelegate<Tuple> dd = new DeserializationDelegate<Tuple>(tss);
+		as.setDeseralizationDelegate(dd, tss);
+
+		
+
+		ObjectInputStream i = new ObjectInputStream(new ByteArrayInputStream(simpleOutputStream.toByteArray()));
+
+		dd.setInstance(tss.createInstance());
+		dd.read(i);
+		System.out.println(dd.getInstance());
+		
+		ObjectInputStream i2 = new ObjectInputStream(new ByteArrayInputStream(b2.toByteArray()));
+		//as.read(i2);
+		dd.setInstance(tss.createInstance());
+		dd.read(i2);
+		System.out.println(dd.getInstance());
 	}
 
 }

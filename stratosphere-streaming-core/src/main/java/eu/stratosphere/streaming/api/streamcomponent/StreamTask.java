@@ -28,6 +28,7 @@ import eu.stratosphere.runtime.io.api.RecordWriter;
 import eu.stratosphere.streaming.api.invokable.DefaultTaskInvokable;
 import eu.stratosphere.streaming.api.invokable.StreamRecordInvokable;
 import eu.stratosphere.streaming.api.invokable.UserTaskInvokable;
+import eu.stratosphere.streaming.api.streamrecord.OutStreamRecord;
 import eu.stratosphere.streaming.api.streamrecord.StreamRecord;
 
 public class StreamTask extends AbstractStreamComponent {
@@ -35,8 +36,8 @@ public class StreamTask extends AbstractStreamComponent {
 	private static final Log log = LogFactory.getLog(StreamTask.class);
 
 	private AbstractRecordReader inputs;
-	private List<RecordWriter<StreamRecord>> outputs;
-	private List<ChannelSelector<StreamRecord>> partitioners;
+	private List<RecordWriter<OutStreamRecord>> outputs;
+	private List<ChannelSelector<OutStreamRecord>> partitioners;
 	private StreamRecordInvokable<Tuple, Tuple> userFunction;
 	private int[] numberOfOutputChannels;
 	private static int numTasks;
@@ -44,8 +45,8 @@ public class StreamTask extends AbstractStreamComponent {
 	public StreamTask() {
 		
 		// TODO: Make configuration file visible and call setClassInputs() here
-		outputs = new LinkedList<RecordWriter<StreamRecord>>();
-		partitioners = new LinkedList<ChannelSelector<StreamRecord>>();
+		outputs = new LinkedList<RecordWriter<OutStreamRecord>>();
+		partitioners = new LinkedList<ChannelSelector<OutStreamRecord>>();
 		userFunction = null;
 		numTasks = newComponent();
 		instanceID = numTasks;
@@ -95,7 +96,7 @@ public class StreamTask extends AbstractStreamComponent {
 			log.debug("TASK " + name + " invoked with instance id " + instanceID);
 		}
 
-		for (RecordWriter<StreamRecord> output : outputs) {
+		for (RecordWriter<OutStreamRecord> output : outputs) {
 			output.initializeSerializers();
 		}
 

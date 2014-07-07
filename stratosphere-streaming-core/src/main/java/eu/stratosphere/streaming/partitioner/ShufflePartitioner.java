@@ -18,15 +18,15 @@ package eu.stratosphere.streaming.partitioner;
 import java.util.Random;
 
 import eu.stratosphere.runtime.io.api.ChannelSelector;
-import eu.stratosphere.streaming.api.streamrecord.StreamRecord;
+import eu.stratosphere.streaming.api.streamrecord.OutStreamRecord;
 
 //Randomly group, to distribute equally
-public class ShufflePartitioner implements ChannelSelector<StreamRecord> {
+public class ShufflePartitioner implements ChannelSelector<OutStreamRecord> {
 
 	private Random random = new Random();
 
 	@Override
-	public int[] selectChannels(StreamRecord record, int numberOfOutputChannels) {
+	public int[] selectChannels(OutStreamRecord record, int numberOfOutputChannels) {
 		return new int[] { random.nextInt(numberOfOutputChannels) };
 	}
 }

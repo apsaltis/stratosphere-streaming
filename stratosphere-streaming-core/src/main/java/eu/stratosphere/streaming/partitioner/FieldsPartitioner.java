@@ -16,21 +16,19 @@
 package eu.stratosphere.streaming.partitioner;
 
 import eu.stratosphere.runtime.io.api.ChannelSelector;
-import eu.stratosphere.streaming.api.streamrecord.StreamRecord;
+import eu.stratosphere.streaming.api.streamrecord.OutStreamRecord;
 
 //Grouping by a key
-public class FieldsPartitioner implements ChannelSelector<StreamRecord> {
+public class FieldsPartitioner implements ChannelSelector<OutStreamRecord> {
 
-	private int keyPosition;
 
 	public FieldsPartitioner(int keyPosition) {
-		this.keyPosition = keyPosition;
 	}
 
 	@Override
-	public int[] selectChannels(StreamRecord record, int numberOfOutputChannels) {
+	public int[] selectChannels(OutStreamRecord record, int numberOfOutputChannels) {
 		//TODO:Better hashing?
 
-		return new int[] { Math.abs(record.getTuple(0).getField(keyPosition).hashCode()) % numberOfOutputChannels };
+		return new int[] {record.partitionHash};
 	}
 }

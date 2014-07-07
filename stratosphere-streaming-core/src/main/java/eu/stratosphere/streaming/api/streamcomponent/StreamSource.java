@@ -26,14 +26,15 @@ import eu.stratosphere.runtime.io.api.ChannelSelector;
 import eu.stratosphere.runtime.io.api.RecordWriter;
 import eu.stratosphere.streaming.api.invokable.DefaultSourceInvokable;
 import eu.stratosphere.streaming.api.invokable.UserSourceInvokable;
+import eu.stratosphere.streaming.api.streamrecord.OutStreamRecord;
 import eu.stratosphere.streaming.api.streamrecord.StreamRecord;
 
 public class StreamSource extends AbstractStreamComponent {
 
 	private static final Log log = LogFactory.getLog(StreamSource.class);
 
-	private List<RecordWriter<StreamRecord>> outputs;
-	private List<ChannelSelector<StreamRecord>> partitioners;
+	private List<RecordWriter<OutStreamRecord>> outputs;
+	private List<ChannelSelector<OutStreamRecord>> partitioners;
 	private UserSourceInvokable<Tuple> userFunction;
 	private static int numSources;
 	private int[] numberOfOutputChannels;
@@ -43,8 +44,8 @@ public class StreamSource extends AbstractStreamComponent {
 	public StreamSource() {
 
 		
-		outputs = new LinkedList<RecordWriter<StreamRecord>>();
-		partitioners = new LinkedList<ChannelSelector<StreamRecord>>();
+		outputs = new LinkedList<RecordWriter<OutStreamRecord>>();
+		partitioners = new LinkedList<ChannelSelector<OutStreamRecord>>();
 		userFunction = null;
 		numSources = newComponent();
 		instanceID = numSources;
@@ -91,7 +92,7 @@ public class StreamSource extends AbstractStreamComponent {
 			log.debug("SOURCE " + name + " invoked with instance id " + instanceID);
 		}
 
-		for (RecordWriter<StreamRecord> output : outputs) {
+		for (RecordWriter<OutStreamRecord> output : outputs) {
 			output.initializeSerializers();
 		}
 		

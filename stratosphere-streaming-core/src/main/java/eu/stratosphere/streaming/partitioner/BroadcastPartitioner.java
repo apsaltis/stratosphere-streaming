@@ -16,12 +16,12 @@
 package eu.stratosphere.streaming.partitioner;
 
 import eu.stratosphere.runtime.io.api.ChannelSelector;
-import eu.stratosphere.streaming.api.streamrecord.StreamRecord;
+import eu.stratosphere.streaming.api.streamrecord.OutStreamRecord;
 
-public class BroadcastPartitioner implements ChannelSelector<StreamRecord> {
+public class BroadcastPartitioner implements ChannelSelector<OutStreamRecord> {
 
 	@Override
-	public int[] selectChannels(StreamRecord record, int numberOfOutputChannels) {
+	public int[] selectChannels(OutStreamRecord record, int numberOfOutputChannels) {
 		int[] returnChannels = new int[numberOfOutputChannels];
 		for (int i = 0; i < numberOfOutputChannels; i++) {
 			returnChannels[i] = i;

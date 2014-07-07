@@ -16,13 +16,13 @@
 package eu.stratosphere.streaming.partitioner;
 
 import eu.stratosphere.runtime.io.api.ChannelSelector;
-import eu.stratosphere.streaming.api.streamrecord.StreamRecord;
+import eu.stratosphere.streaming.api.streamrecord.OutStreamRecord;
 
 //Group to the partitioner with the lowest id
-public class GlobalPartitioner implements ChannelSelector<StreamRecord> {
+public class GlobalPartitioner implements ChannelSelector<OutStreamRecord> {
 
 	@Override
-	public int[] selectChannels(StreamRecord record, int numberOfOutputChannels) {
+	public int[] selectChannels(OutStreamRecord record, int numberOfOutputChannels) {
 		return new int[] { 0 };
 	}
 }
