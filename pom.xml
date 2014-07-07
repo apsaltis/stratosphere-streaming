@@ -239,6 +239,7 @@
 						<excludes>
 							<!-- Additional files like .gitignore etc.-->
 							<exclude>**/.*</exclude>
+							<exclude>**/.*/**</exclude>
 							<!-- Resource files which have values. -->
 							<exclude>**/resources/**</exclude>
 							<!-- Configuration Files. -->
