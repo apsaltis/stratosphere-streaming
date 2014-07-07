@@ -37,7 +37,7 @@ public class WindowWordCountLocal {
 				.readTextStream("src/test/resources/testdata/hamlet.txt")
 				.flatMap(new WindowWordCountSplitter())
 				.partitionBy(0)
-				.flatMap(new WindowWordCountCounter())
+				.flatMap(new WindowWordCountCounter(10, 2, 1, 1))
 				.addSink(new WindowWordCountSink());
 		
 		env.execute();
