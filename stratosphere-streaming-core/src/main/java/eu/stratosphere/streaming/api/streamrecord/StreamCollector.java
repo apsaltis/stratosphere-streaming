@@ -67,7 +67,8 @@ public class StreamCollector implements Collector<byte[]> {
 
 		try {
 			output.emit(streamRecord);
-			output.flush();
+			// TODO:Consider own flushing mechanism
+			// output.flush();
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("emit fail");
