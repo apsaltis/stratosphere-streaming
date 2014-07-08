@@ -95,6 +95,7 @@ public class StreamCollectorManager<T extends Tuple> implements Collector<T> {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		//Cut off serialization of the byte array itself
 		byte[] bytes = bos.toByteArray();
 		collect(Arrays.copyOfRange(bytes, 6, bytes.length), partitionHash);
 
