@@ -88,18 +88,19 @@ public class BatchTest {
 
 	@Test
 	public void test() throws Exception {
-		LocalStreamEnvironment env = StreamExecutionEnvironment.createLocalEnvironment(SINK_PARALLELISM);
+		LocalStreamEnvironment env = StreamExecutionEnvironment.createLocalEnvironment(1);
 
 		DataStream<Tuple1<String>> dataStream1 = env
 				.addSource(new MySource(), SOURCE_PARALLELISM)
-				.flatMap(new MyMap()).setParallelism(1).batch(2)
-				.flatMap(new MyMap()).setParallelism(1).batch(5)
-				.addSink(new MySink()).setParallelism(1);
+				.flatMap(new MyMap()).batch(2)
+				.flatMap(new MyMap()).batch(5)
+				.addSink(new MySink());
 
 		// partitionTest
 		DataStream<Tuple1<String>> dataStream2 = env.addSource(new MySource(), SOURCE_PARALLELISM)
-				.flatMap(new MyMap()).setParallelism(1).batch(4).partitionBy(0)
+				.flatMap(new MyMap()).batch(4).partitionBy(0)
 				.addSink(new MyPartitionSink()).setParallelism(SINK_PARALLELISM);
+		env.setExecutionParallelism(SINK_PARALLELISM);
 
 		env.executeTest(MEMORYSIZE);
 		assertEquals(20, count);
