@@ -37,10 +37,10 @@ import org.apache.flink.streaming.api.function.SinkFunction;
 import org.apache.flink.streaming.api.function.SourceFunction;
 import org.apache.flink.streaming.api.invokable.SinkInvokable;
 import org.apache.flink.streaming.api.invokable.UserTaskInvokable;
+import org.apache.flink.api.java.ExecutionEnvironment;
 
-//TODO:add link to ExecutionEnvironment
 /**
- * ExecutionEnvironment for streaming jobs. An instance of it is necessary to
+ * {@link ExecutionEnvironment} for streaming jobs. An instance of it is necessary to
  * construct streaming topologies.
  * 
  */
@@ -122,7 +122,7 @@ public abstract class StreamExecutionEnvironment {
 	 * executed in {@link LocalStreamEnvironment}.
 	 * 
 	 * @param degreeOfParallelism
-	 *            The degree of parallelismenvironment
+	 *            The degree of parallelism in local environment
 	 */
 	public void setExecutionParallelism(int degreeOfParallelism) {
 		if (degreeOfParallelism < 1)
@@ -226,10 +226,9 @@ public abstract class StreamExecutionEnvironment {
 	public DataStream<Tuple1<Long>> generateSequence(long from, long to) {
 		return addSource(new GenSequenceFunction(from, to), 1);
 	}
-
-	// TODO: Link to DataStream
+	
 	/**
-	 * Ads a data source thus opening a data stream.
+	 * Ads a data source thus opening a {@link DataStream}.
 	 * 
 	 * @param sourceFunction
 	 *            the user defined function

@@ -627,6 +627,10 @@ public class JobGraphBuilder {
 		}
 	}
 
+	/**
+	 * Builds the {@link JobGraph} from the components with the edges and
+	 * settings provided.
+	 */
 	private void buildGraph() {
 
 		for (String componentName : edgeList.keySet()) {
